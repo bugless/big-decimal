@@ -6,14 +6,6 @@ on:
 name: CI
 
 jobs:
-  check-version-and-changelog:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: comigor/actions/check-version-and-changelog@master
-        with:
-          repo_token: ${{ github.token }}
-          base_ref: ${{ github.base_ref }}
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -42,7 +34,6 @@ jobs:
         run: pub run test
   create-tag-and-release:
     needs:
-      - check-version-and-changelog
       - lint
       - test
     runs-on: ubuntu-latest
