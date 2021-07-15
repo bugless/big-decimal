@@ -33,7 +33,7 @@
 Add the following to your `pubspec.yaml`:
 ```yaml
 dependencies:
-  big_decimal: '<=1.0.0'
+  big_decimal: '<1.0.0'
 ```
 
 Then run:
