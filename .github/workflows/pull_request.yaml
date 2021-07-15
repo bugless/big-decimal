@@ -23,7 +23,7 @@ jobs:
         run: dart pub get
       - name: Check formatting
         if: always() && steps.install.outcome == 'success'
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --set-exit-if-changed .
       - name: Run analyzer and annotate
         if: always() && steps.install.outcome == 'success'
         uses: kitek/dartanalyzer-annotations-action@v1
@@ -44,7 +44,7 @@ jobs:
         run: dart pub get
       - name: Test
         if: always() && steps.install.outcome == 'success'
-        run: dart test --file-reporter="json:test-report.json"
+        run: pub run test --file-reporter="json:test-report.json"
         continue-on-error: true
       - name: Annotate with test errors
         uses: rodrigost23/dart-test-annotations@v1.0
