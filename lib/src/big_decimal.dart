@@ -93,6 +93,8 @@ class BigDecimal implements Comparable<BigDecimal> {
         'Invalid operation: Exponent should be between 0 and 999999999');
   }
 
+  BigDecimal operator -() => BigDecimal._(intVal: -intVal, scale: scale);
+
   int _calculatePrecision() {
     if (intVal.sign == 0) {
       return 1;

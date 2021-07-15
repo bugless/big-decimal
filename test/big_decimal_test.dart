@@ -192,4 +192,11 @@ void main() {
       expect(dec('-0.5').pow(3), dec('-0.125'));
     });
   });
+
+  group('unary -', () {
+    test('works', () {
+      expect(-dec('10.0'), dec('-10.0'));
+      expect(-dec('-10.0'), dec('10.0'));
+    });
+  });
 }
