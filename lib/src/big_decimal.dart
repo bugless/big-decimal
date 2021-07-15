@@ -73,6 +73,8 @@ class BigDecimal implements Comparable<BigDecimal> {
 
   bool operator >=(BigDecimal other) => compareTo(other) >= 0;
 
+  BigDecimal operator -() => BigDecimal._(intVal: -intVal, scale: scale);
+
   BigDecimal abs() => BigDecimal._(intVal: intVal.abs(), scale: scale);
 
   BigDecimal divide(
@@ -93,7 +95,26 @@ class BigDecimal implements Comparable<BigDecimal> {
         'Invalid operation: Exponent should be between 0 and 999999999');
   }
 
-  BigDecimal operator -() => BigDecimal._(intVal: -intVal, scale: scale);
+  BigDecimal withScale(
+    int newScale, {
+    RoundingMode roundingMode = RoundingMode.UNNECESSARY,
+  }) {
+    if (scale == newScale) {
+      return this;
+    } else if (intVal.sign == 0) {
+      return BigDecimal._(intVal: BigInt.zero, scale: newScale);
+    } else {
+      if (newScale > scale) {
+        final drop = sumScale(newScale, -scale);
+        final intResult = intVal * BigInt.from(10).pow(drop);
+        return BigDecimal._(intVal: intResult, scale: newScale);
+      } else {
+        final drop = sumScale(scale, -newScale);
+        return _divideAndRound(intVal, BigInt.from(10).pow(drop), newScale,
+            roundingMode, newScale);
+      }
+    }
+  }
 
   int _calculatePrecision() {
     if (intVal.sign == 0) {
@@ -268,7 +289,7 @@ class BigDecimal implements Comparable<BigDecimal> {
   @override
   String toString() {
     final intStr = intVal.toString();
-    return '${intStr.substring(0, intStr.length - scale)}.${intStr.substring(intStr.length)}';
+    return '${intStr.substring(0, intStr.length - scale)}.${intStr.substring(intStr.length - scale)}';
   }
 }
 

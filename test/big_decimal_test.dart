@@ -199,4 +199,18 @@ void main() {
       expect(-dec('-10.0'), dec('10.0'));
     });
   });
+
+  group('withScale', () {
+    test('works', () {
+      expect(dec('100').withScale(2).toString(), '100.00');
+      expect(() => dec('0.331276').withScale(2).toString(), throwsException);
+      expect(
+          dec('0.331276')
+              .withScale(2, roundingMode: RoundingMode.DOWN)
+              .toString(),
+          '.33');
+      // TODO: Need to fix toString before testing this
+      // expect(dec('100').withScale(-2).toString(), '1');
+    });
+  });
 }
