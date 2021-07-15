@@ -1,8 +1,8 @@
-name: big-decimal
+name: big_decimal
 version: 1.0.0
 description: >
   BigDecimal implementation
-repository: https://github.com/zoeira
+repository: https://github.com/bugless/big_decimal
 environment:
   sdk: ">=2.12.0 <3.0.0"
 

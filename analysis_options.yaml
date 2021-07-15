@@ -11,7 +11,7 @@ analyzer:
     - test/**/*.dart
 linter:
   rules:
-    - public_member_api_docs
-    - type_annotate_public_apis
+    # - public_member_api_docs
+    # - type_annotate_public_apis
     - void_checks
     - unnecessary_new
