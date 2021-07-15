@@ -181,4 +181,15 @@ void main() {
       );
     });
   });
+
+  group('pow', () {
+    test('works', () {
+      expect(dec('10.0').pow(2), dec('100.00'));
+      expect(dec('-10.0').pow(2), dec('100.00'));
+      expect(dec('-10.0').pow(3), dec('-1000.00'));
+      expect(dec('0.5').pow(2), dec('0.25'));
+      expect(dec('0.50').pow(2), dec('0.2500'));
+      expect(dec('-0.5').pow(3), dec('-0.125'));
+    });
+  });
 }

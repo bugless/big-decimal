@@ -83,6 +83,16 @@ class BigDecimal implements Comparable<BigDecimal> {
       _divide(intVal, this.scale, divisor.intVal, divisor.scale,
           scale ?? this.scale, roundingMode);
 
+  BigDecimal pow(int n) {
+    if (n >= 0 && n <= 999999999) {
+      // TODO: Check scale of this multiplication
+      final newScale = scale * n;
+      return BigDecimal._(intVal: intVal.pow(n), scale: newScale);
+    }
+    throw Exception(
+        'Invalid operation: Exponent should be between 0 and 999999999');
+  }
+
   int _calculatePrecision() {
     if (intVal.sign == 0) {
       return 1;
