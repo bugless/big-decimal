@@ -1,0 +1,80 @@
+on:
+  push:
+    branches:
+      - main
+
+name: CI
+
+jobs:
+  check-version-and-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: comigor/actions/check-version-and-changelog@master
+        with:
+          repo_token: ${{ github.token }}
+          base_ref: ${{ github.base_ref }}
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 2.13.4
+      - id: install
+        name: Install dependencies
+        run: dart pub get
+      - name: Check formatting
+        if: always() && steps.install.outcome == 'success'
+        run: dart format --set-exit-if-changed .
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 2.13.4
+      - id: install
+        name: Install dependencies
+        run: dart pub get
+      - name: Test
+        if: always() && steps.install.outcome == 'success'
+        run: pub run test
+  create-tag-and-release:
+    needs:
+      - check-version-and-changelog
+      - lint
+      - test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+      - id: check_version_and_changelog
+        name: Check if version on pubspec.yaml was changed and if there's an entry for this new version on CHANGELOG
+        uses: comigor/actions/check-version-and-changelog@master
+        with:
+          base_ref: ${{ github.ref }}
+      - name: Push tag
+        uses: anothrNick/github-tag-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_TAG: v${{ steps.check_version_and_changelog.outputs.package_version }}
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.check_version_and_changelog.outputs.package_version }}
+          release_name: Release v${{ steps.check_version_and_changelog.outputs.package_version }}
+  deploy:
+    needs: create-tag-and-release
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Publish to pub.dev
+        uses: comigor/actions/pub-publish@master
+        env:
+          PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
+        with:
+          pub_credentials: ${{ secrets.PUB_CREDENTIALS }}
