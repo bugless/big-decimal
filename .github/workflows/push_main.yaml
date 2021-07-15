@@ -45,6 +45,7 @@ jobs:
         uses: comigor/actions/check-version-and-changelog@master
         with:
           base_ref: ${{ github.ref }}
+        continue-on-error: true
       - name: Push tag
         uses: anothrNick/github-tag-action@master
         env:
