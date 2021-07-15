@@ -46,6 +46,11 @@ jobs:
         if: always() && steps.install.outcome == 'success'
         run: pub run test --file-reporter="json:test-report.json"
         continue-on-error: true
+      - name: Debug
+        run: |
+          ls -lsa
+          ls -lsa test/
+        continue-on-error: true
       - name: Annotate with test errors
         uses: rodrigost23/dart-test-annotations@v1.0
         with:
