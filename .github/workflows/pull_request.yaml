@@ -44,7 +44,7 @@ jobs:
         run: dart pub get
       - name: Test
         if: always() && steps.install.outcome == 'success'
-        run: pub run test --file-reporter="json:test-report.json"
+        run: pub run test --file-reporter='json:test-report.json'
         continue-on-error: true
       - name: Debug
         run: |
