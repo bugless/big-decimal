@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.2.0
+- Implement and test toDouble, toBigInt and toInt
+
 ## 0.1.0
 - Better parser and toString implementations
 - Fix problems with rounding
