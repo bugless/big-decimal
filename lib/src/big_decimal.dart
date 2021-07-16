@@ -292,5 +292,3 @@ class BigDecimal implements Comparable<BigDecimal> {
     return '${intStr.substring(0, intStr.length - scale)}.${intStr.substring(intStr.length - scale)}';
   }
 }
-
-BigDecimal dec(String value) => BigDecimal.parse(value);
