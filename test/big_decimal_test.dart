@@ -22,14 +22,11 @@ void main() {
         tabCase(['2', 2, 0, 1], 'positive integer with no decimal places'),
         tabCase(['-2', -2, 0, 1], 'negative integer with no decimal places'),
         tabCase(['2.000', 2000, 3, 4], 'positive integer with decimal places'),
-        tabCase(
-            ['-2.000', -2000, 3, 4], 'negative integer with decimal places'),
+        tabCase(['-2.000', -2000, 3, 4], 'negative integer with decimal places'),
         tabCase(['2.01', 201, 2, 3], 'positive number with decimal places'),
         tabCase(['-2.01', -201, 2, 3], 'negative number with decimal places'),
-        tabCase(
-            ['-.2e1', -2, 0, 1], 'negative with decimal places and exponent'),
-        tabCase(['-.2e-1', -2, 2, 1],
-            'negative with decimal places and negative exponent'),
+        tabCase(['-.2e1', -2, 0, 1], 'negative with decimal places and exponent'),
+        tabCase(['-.2e-1', -2, 2, 1], 'negative with decimal places and negative exponent'),
         tabCase(['10.00e2', 1000, 0, 4], 'with exponential'),
         tabCase(['10e2', 10, -2, 2], 'with exponential and negative scale'),
         tabCase(['10.e2', 10, -2, 2], 'with exponential and negative scale'),
@@ -114,8 +111,7 @@ void main() {
   group('division', () {
     group(
       'divide',
-      tabular((Object a, Object b, Object result,
-          [RoundingMode roundingMode = RoundingMode.UNNECESSARY, int? scale]) {
+      tabular((Object a, Object b, Object result, [RoundingMode roundingMode = RoundingMode.UNNECESSARY, int? scale]) {
         expect(
           a.dec.divide(b.dec, roundingMode: roundingMode, scale: scale),
           exactly(result.dec),
@@ -138,8 +134,7 @@ void main() {
       ]),
     );
 
-    test('unable to divide to repeating decimals without proper RoundingMode',
-        () {
+    test('unable to divide to repeating decimals without proper RoundingMode', () {
       // 0.3333333...
       expect(() => '10'.dec.divide('3'.dec), throwsException);
       // 7.3828282...
@@ -267,8 +262,7 @@ void main() {
     group('successfully changing the scale', () {
       group(
         'simple cases',
-        tabular((Object a, int newScale, Object result,
-            [RoundingMode roundingMode = RoundingMode.UNNECESSARY]) {
+        tabular((Object a, int newScale, Object result, [RoundingMode roundingMode = RoundingMode.UNNECESSARY]) {
           expect(
             a.dec.withScale(newScale, roundingMode: roundingMode),
             exactly(result.dec),
@@ -292,26 +286,18 @@ void main() {
           String half_even,
           Object unnecessary,
         ) {
-          BigDecimal round(RoundingMode mode) =>
-              input.dec.withScale(0, roundingMode: mode);
+          BigDecimal round(RoundingMode mode) => input.dec.withScale(0, roundingMode: mode);
           expect(round(RoundingMode.UP), exactly(up.dec), reason: 'UP');
           expect(round(RoundingMode.DOWN), exactly(down.dec), reason: 'DOWN');
-          expect(round(RoundingMode.CEILING), exactly(ceiling.dec),
-              reason: 'CEILING');
-          expect(round(RoundingMode.FLOOR), exactly(floor.dec),
-              reason: 'FLOOR');
-          expect(round(RoundingMode.HALF_UP), exactly(half_up.dec),
-              reason: 'HALF_UP');
-          expect(round(RoundingMode.HALF_DOWN), exactly(half_down.dec),
-              reason: 'HALF_DOWN');
-          expect(round(RoundingMode.HALF_EVEN), exactly(half_even.dec),
-              reason: 'HALF_EVEN');
+          expect(round(RoundingMode.CEILING), exactly(ceiling.dec), reason: 'CEILING');
+          expect(round(RoundingMode.FLOOR), exactly(floor.dec), reason: 'FLOOR');
+          expect(round(RoundingMode.HALF_UP), exactly(half_up.dec), reason: 'HALF_UP');
+          expect(round(RoundingMode.HALF_DOWN), exactly(half_down.dec), reason: 'HALF_DOWN');
+          expect(round(RoundingMode.HALF_EVEN), exactly(half_even.dec), reason: 'HALF_EVEN');
           if (unnecessary is String) {
-            expect(round(RoundingMode.UNNECESSARY), exactly(unnecessary.dec),
-                reason: 'UNNECESSARY');
+            expect(round(RoundingMode.UNNECESSARY), exactly(unnecessary.dec), reason: 'UNNECESSARY');
           } else {
-            expect(() => round(RoundingMode.UNNECESSARY), unnecessary,
-                reason: 'UNNECESSARY');
+            expect(() => round(RoundingMode.UNNECESSARY), unnecessary, reason: 'UNNECESSARY');
           }
         }, [
           // Input  UP  DOWN  CEILING  FLOOR  HALF_UP  HALF_DOWN  HALF_EVEN  UNNECESSARY
@@ -321,50 +307,10 @@ void main() {
           tabCase(['1.1', '2', '1', '2', '1', '1', '1', '1', throwsException]),
           tabCase(['1.0', '1', '1', '1', '1', '1', '1', '1', '1']),
           tabCase(['-1.0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1']),
-          tabCase([
-            '-1.1',
-            '-2',
-            '-1',
-            '-1',
-            '-2',
-            '-1',
-            '-1',
-            '-1',
-            throwsException
-          ]),
-          tabCase([
-            '-1.6',
-            '-2',
-            '-1',
-            '-1',
-            '-2',
-            '-2',
-            '-2',
-            '-2',
-            throwsException
-          ]),
-          tabCase([
-            '-2.5',
-            '-3',
-            '-2',
-            '-2',
-            '-3',
-            '-3',
-            '-2',
-            '-2',
-            throwsException
-          ]),
-          tabCase([
-            '-5.5',
-            '-6',
-            '-5',
-            '-5',
-            '-6',
-            '-6',
-            '-5',
-            '-6',
-            throwsException
-          ]),
+          tabCase(['-1.1', '-2', '-1', '-1', '-2', '-1', '-1', '-1', throwsException]),
+          tabCase(['-1.6', '-2', '-1', '-1', '-2', '-2', '-2', '-2', throwsException]),
+          tabCase(['-2.5', '-3', '-2', '-2', '-3', '-3', '-2', '-2', throwsException]),
+          tabCase(['-5.5', '-6', '-5', '-5', '-6', '-6', '-5', '-6', throwsException]),
         ]),
       );
     });

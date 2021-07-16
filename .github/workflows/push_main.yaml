@@ -18,7 +18,7 @@ jobs:
         run: dart pub get
       - name: Check formatting
         if: always() && steps.install.outcome == 'success'
-        run: dart format --set-exit-if-changed .
+        run: dart format --line-length 120 --set-exit-if-changed .
   test:
     runs-on: ubuntu-latest
     steps:
