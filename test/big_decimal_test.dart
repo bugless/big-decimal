@@ -68,153 +68,190 @@ void main() {
     ]),
   );
 
-  group('< operator', () {
-    test('works', () {
-      expect('38.2873'.dec < '98129'.dec, true);
-      expect('32487239'.dec < '98129'.dec, false);
-      expect('-12.1287'.dec < '10.7861'.dec, true);
-      expect('-100.1287'.dec < '-1.2872'.dec, true);
-      expect('10.01'.dec < '10.01'.dec, false);
-    });
-  });
+  group(
+    'unary -',
+    tabular((Object a, Object result) {
+      expect(
+        -a.dec,
+        exactly(result.dec),
+      );
+    }, [
+      tabCase(['10.0', '-10.0']),
+      tabCase(['-10.0', '10.0']),
+    ]),
+  );
 
-  group('<= operator', () {
-    test('works', () {
-      expect('38.2873'.dec <= '98129'.dec, true);
-      expect('32487239'.dec <= '98129'.dec, false);
-      expect('-12.1287'.dec <= '10.7861'.dec, true);
-      expect('-100.1287'.dec <= '-1.2872'.dec, true);
-      expect('10.01'.dec <= '10.01'.dec, true);
-    });
-  });
+  group('division', () {
+    group(
+      'divide',
+      tabular((Object a, Object b, Object result,
+          [RoundingMode roundingMode = RoundingMode.UNNECESSARY, int? scale]) {
+        expect(
+          a.dec.divide(b.dec, roundingMode: roundingMode, scale: scale),
+          exactly(result.dec),
+        );
+      }, [
+        tabCase(['20', '2', '10']),
+        tabCase(['20', '-2', '-10']),
+        tabCase(['20.0', '2.5', '8.0']),
+        tabCase(['10', '3', '4', RoundingMode.UP]),
+        tabCase(['10', '3', '4', RoundingMode.CEILING]),
+        tabCase(['10', '3', '3', RoundingMode.DOWN]),
+        tabCase(['10', '3', '3', RoundingMode.FLOOR]),
+        tabCase(['10', '3', '3', RoundingMode.HALF_DOWN]),
+        tabCase(['10', '3', '3', RoundingMode.HALF_EVEN]),
+        tabCase(['10', '3', '3', RoundingMode.HALF_UP]),
+        tabCase(['10', '3', '3.34', RoundingMode.CEILING, 2]),
+        tabCase(['10', '8', '1.2', RoundingMode.HALF_DOWN, 1]),
+        tabCase(['10', '8', '1.2', RoundingMode.HALF_EVEN, 1]),
+        tabCase(['10', '8', '1.3', RoundingMode.HALF_UP, 1]),
+      ]),
+    );
 
-  group('> operator', () {
-    test('works', () {
-      expect('38.2873'.dec > '98129'.dec, false);
-      expect('32487239'.dec > '98129'.dec, true);
-      expect('-12.1287'.dec > '10.7861'.dec, false);
-      expect('-100.1287'.dec > '-1.2872'.dec, false);
-      expect('10.01'.dec > '10.01'.dec, false);
-    });
-  });
-
-  group('>= operator', () {
-    test('works', () {
-      expect('38.2873'.dec >= '98129'.dec, false);
-      expect('32487239'.dec >= '98129'.dec, true);
-      expect('-12.1287'.dec >= '10.7861'.dec, false);
-      expect('-100.1287'.dec >= '-1.2872'.dec, false);
-      expect('10.01'.dec >= '10.01'.dec, true);
-    });
-  });
-
-  group('== operator', () {
-    test('works', () {
-      expect('10.0198'.dec == '10.0198'.dec, true);
-      expect('10.0198'.dec == '10.0199'.dec, false);
-      expect('10.0198'.dec == '10.01980000'.dec, true);
-      expect('10.0198'.dec == '0000010.0198'.dec, true);
-      expect('-10.0198'.dec == '-10.0198'.dec, true);
-      expect('0'.dec == '-0'.dec, true);
-    });
-  });
-
-  group('abs()', () {
-    test('works', () {
-      expect('10.0198'.dec.abs(), '10.0198'.dec);
-      expect('-10.0198'.dec.abs(), '10.0198'.dec);
-      expect('0'.dec.abs(), '0'.dec);
-      expect('-0'.dec.abs(), '0'.dec);
-    });
-  });
-
-  group('divide', () {
-    test('division works', () {
-      expect('20'.dec.divide('2'.dec), '10'.dec);
-      expect('20.0'.dec.divide('2.5'.dec), '8.0'.dec);
-      expect('20'.dec.divide('-2'.dec), '-10'.dec);
+    test('unable to divide to repeating decimals without proper RoundingMode',
+        () {
+      // 0.3333333...
       expect(() => '10'.dec.divide('3'.dec), throwsException);
-      expect(
-        '10'.dec.divide('3'.dec, roundingMode: RoundingMode.CEILING),
-        '4'.dec,
-      );
-      expect(
-        '10'.dec.divide('3'.dec, roundingMode: RoundingMode.UP),
-        '4'.dec,
-      );
-      expect(
-        '10'.dec.divide('3'.dec, roundingMode: RoundingMode.FLOOR),
-        '3'.dec,
-      );
-      expect(
-        '10'.dec.divide('3'.dec, roundingMode: RoundingMode.DOWN),
-        '3'.dec,
-      );
-      expect(
-        '10'.dec.divide('3'.dec, roundingMode: RoundingMode.HALF_DOWN),
-        '3'.dec,
-      );
-      expect(
-        '10'.dec.divide('3'.dec, roundingMode: RoundingMode.HALF_EVEN),
-        '3'.dec,
-      );
-      expect(
-        '10'.dec.divide('3'.dec, roundingMode: RoundingMode.HALF_UP),
-        '3'.dec,
-      );
-      expect(
-        '10'.dec.divide('3'.dec, roundingMode: RoundingMode.CEILING, scale: 2),
-        '3.34'.dec,
-      );
-      expect(
-        '10'
-            .dec
-            .divide('8'.dec, roundingMode: RoundingMode.HALF_EVEN, scale: 1),
-        '1.2'.dec,
-      );
-      expect(
-        '10'.dec.divide('8'.dec, roundingMode: RoundingMode.HALF_UP, scale: 1),
-        '1.3'.dec,
-      );
-      expect(
-        '10'
-            .dec
-            .divide('8'.dec, roundingMode: RoundingMode.HALF_DOWN, scale: 1),
-        '1.2'.dec,
-      );
+      // 7.3828282...
+      expect(() => '7309'.dec.divide('990'.dec), throwsException);
     });
   });
 
-  group('pow', () {
-    test('works', () {
-      expect('10.0'.dec.pow(2), '100.00'.dec);
-      expect('-10.0'.dec.pow(2), '100.00'.dec);
-      expect('-10.0'.dec.pow(3), '-1000.00'.dec);
-      expect('0.5'.dec.pow(2), '0.25'.dec);
-      expect('0.50'.dec.pow(2), '0.2500'.dec);
-      expect('-0.5'.dec.pow(3), '-0.125'.dec);
-    });
-  });
+  group(
+    'pow',
+    tabular((Object a, int b, Object result) {
+      expect(
+        a.dec.pow(b),
+        exactly(result.dec),
+      );
+    }, [
+      tabCase(['10.0', 2, '100.00']),
+      tabCase(['-10.0', 2, '100.00']),
+      tabCase(['-10.0', 3, '-1000.000']),
+      tabCase(['0.5', 2, '0.25']),
+      tabCase(['0.50', 2, '0.2500']),
+      tabCase(['-0.5', 3, '-0.125']),
+    ]),
+  );
 
-  group('unary -', () {
-    test('works', () {
-      expect(-'10.0'.dec, '-10.0'.dec);
-      expect(-'-10.0'.dec, '10.0'.dec);
-    });
-  });
+  group(
+    '< operator',
+    tabular((Object a, Object b, bool result) {
+      expect(
+        a.dec < b.dec,
+        result,
+      );
+    }, [
+      tabCase(['38.2873'.dec, '98129'.dec, true]),
+      tabCase(['32487239'.dec, '98129'.dec, false]),
+      tabCase(['-12.1287'.dec, '10.7861'.dec, true]),
+      tabCase(['-100.1287'.dec, '-1.2872'.dec, true]),
+      tabCase(['10.01'.dec, '10.01'.dec, false]),
+    ]),
+  );
 
-  group('withScale', () {
-    test('works', () {
-      expect('100'.dec.withScale(2).toString(), '100.00');
+  group(
+    '<= operator',
+    tabular((Object a, Object b, bool result) {
+      expect(
+        a.dec <= b.dec,
+        result,
+      );
+    }, [
+      tabCase(['38.2873'.dec, '98129'.dec, true]),
+      tabCase(['32487239'.dec, '98129'.dec, false]),
+      tabCase(['-12.1287'.dec, '10.7861'.dec, true]),
+      tabCase(['-100.1287'.dec, '-1.2872'.dec, true]),
+      tabCase(['10.01'.dec, '10.01'.dec, true]),
+    ]),
+  );
+
+  group(
+    '> operator',
+    tabular((Object a, Object b, bool result) {
+      expect(
+        a.dec > b.dec,
+        result,
+      );
+    }, [
+      tabCase(['38.2873'.dec, '98129'.dec, false]),
+      tabCase(['32487239'.dec, '98129'.dec, true]),
+      tabCase(['-12.1287'.dec, '10.7861'.dec, false]),
+      tabCase(['-100.1287'.dec, '-1.2872'.dec, false]),
+      tabCase(['10.01'.dec, '10.01'.dec, false]),
+    ]),
+  );
+
+  group(
+    '>= operator',
+    tabular((Object a, Object b, bool result) {
+      expect(
+        a.dec >= b.dec,
+        result,
+      );
+    }, [
+      tabCase(['38.2873'.dec, '98129'.dec, false]),
+      tabCase(['32487239'.dec, '98129'.dec, true]),
+      tabCase(['-12.1287'.dec, '10.7861'.dec, false]),
+      tabCase(['-100.1287'.dec, '-1.2872'.dec, false]),
+      tabCase(['10.01'.dec, '10.01'.dec, true]),
+    ]),
+  );
+
+  group(
+    '== operator',
+    tabular((Object a, Object b, bool result) {
+      expect(
+        a.dec == b.dec,
+        result,
+      );
+    }, [
+      tabCase(['38.2873'.dec, '98129'.dec, false]),
+      tabCase(['32487239'.dec, '98129'.dec, false]),
+      tabCase(['-12.1287'.dec, '10.7861'.dec, false]),
+      tabCase(['-100.1287'.dec, '-1.2872'.dec, false]),
+      tabCase(['10.01'.dec, '10.01'.dec, true]),
+      tabCase(['10.01'.dec, '10.010'.dec, true]),
+      tabCase(['010'.dec, '10.0'.dec, true]),
+      tabCase(['10'.dec, '10.0'.dec, true]),
+      tabCase(['10'.dec, '10.00'.dec, true]),
+    ]),
+  );
+
+  group(
+    'abs()',
+    tabular((Object a, Object result) {
+      expect(
+        a.dec.abs(),
+        exactly(result.dec),
+      );
+    }, [
+      tabCase(['10.0198', '10.0198']),
+      tabCase(['-10.0198', '10.0198']),
+      tabCase(['0', '0']),
+      tabCase(['-0', '0']),
+    ]),
+  );
+
+  group('changing scale', () {
+    group(
+      'withScale()',
+      tabular((Object a, int newScale, Object result,
+          [RoundingMode roundingMode = RoundingMode.UNNECESSARY]) {
+        expect(
+          a.dec.withScale(newScale, roundingMode: roundingMode),
+          exactly(result.dec),
+        );
+      }, [
+        tabCase(['100', 2, '100.00']),
+        tabCase(['0.331276', 2, '.33', RoundingMode.DOWN]),
+        // TODO: Need to fix toString before testing this
+        // expect('100'.d.withScale(-2).toString(), '1');
+      ]),
+    );
+
+    test('unable to changing scale without proper RoundingMode', () {
       expect(() => '0.331276'.dec.withScale(2).toString(), throwsException);
-      expect(
-          '0.331276'
-              .dec
-              .withScale(2, roundingMode: RoundingMode.DOWN)
-              .toString(),
-          '.33');
-      // TODO: Need to fix toString before testing this
-      // expect('100'.d.withScale(-2).toString(), '1');
     });
   });
 }
