@@ -235,9 +235,8 @@ class BigDecimal implements Comparable<BigDecimal> {
     int preferredScale,
   ) {
     final quotient = dividend ~/ divisor;
-    final remainder = dividend.remainder(divisor);
+    final remainder = dividend.remainder(divisor).abs();
     final quotientPositive = dividend.sign == divisor.sign;
-
     if (remainder != BigInt.zero) {
       if (_needIncrement(
           divisor, roundingMode, quotientPositive, quotient, remainder)) {

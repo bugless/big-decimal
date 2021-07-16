@@ -263,24 +263,113 @@ void main() {
     ]),
   );
 
-  group('changing scale', () {
-    group(
-      'withScale()',
-      tabular((Object a, int newScale, Object result,
-          [RoundingMode roundingMode = RoundingMode.UNNECESSARY]) {
-        expect(
-          a.dec.withScale(newScale, roundingMode: roundingMode),
-          exactly(result.dec),
-        );
-      }, [
-        tabCase(['100', 2, '100.00']),
-        tabCase(['0.331276', 2, '.33', RoundingMode.DOWN]),
-        // TODO: Need to fix toString before testing this
-        // expect('100'.d.withScale(-2).toString(), '1');
-      ]),
-    );
+  group('withScale()', () {
+    group('successfully changing the scale', () {
+      group(
+        'simple cases',
+        tabular((Object a, int newScale, Object result,
+            [RoundingMode roundingMode = RoundingMode.UNNECESSARY]) {
+          expect(
+            a.dec.withScale(newScale, roundingMode: roundingMode),
+            exactly(result.dec),
+          );
+        }, [
+          tabCase(['100', 2, '100.00']),
+          tabCase(['100', -2, '1e+2']),
+          tabCase(['0.331276', 2, '.33', RoundingMode.DOWN]),
+        ]),
+      );
+      group(
+        'table from Java RoundingMode docs',
+        tabular((
+          String input,
+          String up,
+          String down,
+          String ceiling,
+          String floor,
+          String half_up,
+          String half_down,
+          String half_even,
+          Object unnecessary,
+        ) {
+          BigDecimal round(RoundingMode mode) =>
+              input.dec.withScale(0, roundingMode: mode);
+          expect(round(RoundingMode.UP), exactly(up.dec), reason: 'UP');
+          expect(round(RoundingMode.DOWN), exactly(down.dec), reason: 'DOWN');
+          expect(round(RoundingMode.CEILING), exactly(ceiling.dec),
+              reason: 'CEILING');
+          expect(round(RoundingMode.FLOOR), exactly(floor.dec),
+              reason: 'FLOOR');
+          expect(round(RoundingMode.HALF_UP), exactly(half_up.dec),
+              reason: 'HALF_UP');
+          expect(round(RoundingMode.HALF_DOWN), exactly(half_down.dec),
+              reason: 'HALF_DOWN');
+          expect(round(RoundingMode.HALF_EVEN), exactly(half_even.dec),
+              reason: 'HALF_EVEN');
+          if (unnecessary is String) {
+            expect(round(RoundingMode.UNNECESSARY), exactly(unnecessary.dec),
+                reason: 'UNNECESSARY');
+          } else {
+            expect(() => round(RoundingMode.UNNECESSARY), unnecessary,
+                reason: 'UNNECESSARY');
+          }
+        }, [
+          // Input  UP  DOWN  CEILING  FLOOR  HALF_UP  HALF_DOWN  HALF_EVEN  UNNECESSARY
+          tabCase(['5.5', '6', '5', '6', '5', '6', '5', '6', throwsException]),
+          tabCase(['2.5', '3', '2', '3', '2', '3', '2', '2', throwsException]),
+          tabCase(['1.6', '2', '1', '2', '1', '2', '2', '2', throwsException]),
+          tabCase(['1.1', '2', '1', '2', '1', '1', '1', '1', throwsException]),
+          tabCase(['1.0', '1', '1', '1', '1', '1', '1', '1', '1']),
+          tabCase(['-1.0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1']),
+          tabCase([
+            '-1.1',
+            '-2',
+            '-1',
+            '-1',
+            '-2',
+            '-1',
+            '-1',
+            '-1',
+            throwsException
+          ]),
+          tabCase([
+            '-1.6',
+            '-2',
+            '-1',
+            '-1',
+            '-2',
+            '-2',
+            '-2',
+            '-2',
+            throwsException
+          ]),
+          tabCase([
+            '-2.5',
+            '-3',
+            '-2',
+            '-2',
+            '-3',
+            '-3',
+            '-2',
+            '-2',
+            throwsException
+          ]),
+          tabCase([
+            '-5.5',
+            '-6',
+            '-5',
+            '-5',
+            '-6',
+            '-6',
+            '-5',
+            '-6',
+            throwsException
+          ]),
+        ]),
+      );
+    });
 
-    test('unable to changing scale without proper RoundingMode', () {
+    test('unable to change scale without proper RoundingMode', () {
       expect(() => '0.331276'.dec.withScale(2).toString(), throwsException);
     });
   });
