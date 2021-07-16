@@ -348,8 +348,6 @@ class BigDecimal implements Comparable<BigDecimal> {
     final adjusted = (intStr.length - 1) - scale;
     // Java's heuristic to avoid too many decimal places
     if (scale >= 0 && adjusted >= -6) {
-      print(intStr);
-      print(scale);
       if (intStr.length > scale) {
         final integerPart = intStr.substring(0, intStr.length - scale);
         b.write(integerPart);

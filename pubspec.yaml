@@ -1,5 +1,5 @@
 name: big_decimal
-version: 0.2.0
+version: 0.2.1
 description: >
   A bugless implementation of BigDecimal in Dart based on Java's BigDecimal
 
