@@ -1,7 +1,10 @@
 import 'package:big_decimal/big_decimal.dart';
 
 extension CoerceToBigDecimal on Object {
-  BigDecimal get d {
+  BigDecimal get dec {
+    if (this is BigDecimal) {
+      return this as BigDecimal;
+    }
     if (this is String) {
       return BigDecimal.parse(this as String);
     }
