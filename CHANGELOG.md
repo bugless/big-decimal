@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.2.1
+- Remove undue logs
+
 ## 0.2.0
 - Implement and test toDouble, toBigInt and toInt
 
