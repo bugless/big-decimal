@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.0.1
+- Adds some basic operators: `+`, `-`, `*`, `divide`, `abs`, `</<=/>/>=/==`
+- CompareTo has a basic implementation that lacks optimization
+- Lots of TODOs still
+- Parse and toString are on a very draft impl just to test
+
 ## 0.0.1-ci.2
 - Add README and test CI.
 

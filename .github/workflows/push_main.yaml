@@ -64,7 +64,14 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
+      - name: Check PR labels action step
+        id: check_pr_labels
+        uses: shioyang/check-pr-labels-on-push-action@v1.0.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          labels: '["release"]'
       - name: Publish to pub.dev
+        if: steps.check_pr_labels.outputs.result == 'true'
         uses: comigor/actions/pub-publish@master
         env:
           PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
