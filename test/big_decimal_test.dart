@@ -6,22 +6,52 @@ import 'helpers/matchers.dart';
 import 'helpers/tabular.dart';
 
 void main() {
-  group(
-    'parse',
-    tabular((String s, int intVal, int scale, int precision) {
-      final decimal = s.dec;
-      expect(decimal.intVal, BigInt.from(intVal), reason: 'intVal');
-      expect(decimal.scale, scale, reason: 'scale');
-      expect(decimal.precision, precision, reason: 'precision');
-    }, [
-      tabCase(['2', 2, 0, 1], 'positive integer with no decimal places'),
-      tabCase(['-2', -2, 0, 1], 'negative integer with no decimal places'),
-      tabCase(['2.000', 2000, 3, 4], 'positive integer with decimal places'),
-      tabCase(['-2.000', -2000, 3, 4], 'negative integer with decimal places'),
-      tabCase(['2.01', 201, 2, 3], 'positive number with decimal places'),
-      tabCase(['-2.01', -201, 2, 3], 'negative number with decimal places'),
-    ]),
-  );
+  group('parse', () {
+    group(
+      'parses correctly',
+      tabular((String s, int intVal, int scale, int precision) {
+        final decimal = BigDecimal.parse(s);
+        expect(decimal.intVal, BigInt.from(intVal), reason: 'intVal');
+        expect(decimal.scale, scale, reason: 'scale');
+        expect(decimal.precision, precision, reason: 'precision');
+      }, [
+        tabCase(['0.2', 2, 1, 1], 'only decimal places'),
+        tabCase(['.2', 2, 1, 1], 'only decimal places'),
+        tabCase(['-0.2', -2, 1, 1], 'negative with decimal places'),
+        tabCase(['-.2', -2, 1, 1], 'negative with decimal places'),
+        tabCase(['2', 2, 0, 1], 'positive integer with no decimal places'),
+        tabCase(['-2', -2, 0, 1], 'negative integer with no decimal places'),
+        tabCase(['2.000', 2000, 3, 4], 'positive integer with decimal places'),
+        tabCase(
+            ['-2.000', -2000, 3, 4], 'negative integer with decimal places'),
+        tabCase(['2.01', 201, 2, 3], 'positive number with decimal places'),
+        tabCase(['-2.01', -201, 2, 3], 'negative number with decimal places'),
+        tabCase(
+            ['-.2e1', -2, 0, 1], 'negative with decimal places and exponent'),
+        tabCase(['-.2e-1', -2, 2, 1],
+            'negative with decimal places and negative exponent'),
+        tabCase(['10.00e2', 1000, 0, 4], 'with exponential'),
+        tabCase(['10e2', 10, -2, 2], 'with exponential and negative scale'),
+        tabCase(['10.e2', 10, -2, 2], 'with exponential and negative scale'),
+        tabCase(['10e-2', 10, 2, 2], 'with negative exponential'),
+        tabCase(['10e+2', 10, -2, 2], 'with exponential'),
+      ]),
+    );
+
+    group(
+      'throws while parsing',
+      tabular((String s, [TypeMatcher? type]) {
+        expect(() => BigDecimal.parse(s), throwsA(type ?? isA<Exception>()));
+      }, [
+        tabCase(['', isA<RangeError>()]),
+        tabCase(['.']),
+        tabCase(['e']),
+        tabCase(['e2']),
+        tabCase(['.e2']),
+        tabCase(['1e']),
+      ]),
+    );
+  });
 
   group(
     '+ operator',

@@ -11,6 +11,14 @@ enum RoundingMode {
   UNNECESSARY,
 }
 
+const plusCode = 43;
+const minusCode = 45;
+const dotCode = 46;
+const smallECode = 101;
+const capitalECode = 69;
+const zeroCode = 48;
+const nineCode = 57;
+
 class BigDecimal implements Comparable<BigDecimal> {
   BigDecimal._({
     required this.intVal,
@@ -24,26 +32,79 @@ class BigDecimal implements Comparable<BigDecimal> {
     );
   }
 
+  static int nextNonDigit(String value, [int start = 0]) {
+    var index = start;
+    for (; index < value.length; index++) {
+      final code = value.codeUnitAt(index);
+      if (code < zeroCode || code > nineCode) {
+        break;
+      }
+    }
+    return index;
+  }
+
+  static BigDecimal? tryParse(String value) {
+    try {
+      return BigDecimal.parse(value);
+    } catch (e) {
+      return null;
+    }
+  }
+
   factory BigDecimal.parse(String value) {
-    // TODO: Change this into Java implementation
-    final match = _pattern.firstMatch(value);
-    if (match == null) {
-      throw FormatException('Invalid BigDecimal forma for $value');
-    }
-    final intPart = match.group(1)!;
-    final decimalWithSeparator = match.group(2);
+    var sign = '';
+    var index = 0;
+    var nextIndex = 0;
 
-    if (decimalWithSeparator != null) {
-      final decimalPart = decimalWithSeparator.substring(1);
-      return BigDecimal._(
-        intVal: BigInt.parse(intPart + decimalPart),
-        scale: decimalPart.length,
-      );
+    switch (value.codeUnitAt(index)) {
+      case minusCode:
+        sign = '-';
+        index++;
+        break;
+      case plusCode:
+        index++;
+        break;
+      default:
+        break;
     }
 
-    return BigDecimal._(
-      intVal: BigInt.parse(intPart),
-      scale: 0,
+    nextIndex = nextNonDigit(value, index);
+    final integerPart = '$sign${value.substring(index, nextIndex)}';
+    index = nextIndex;
+
+    if (index >= value.length) {
+      return BigDecimal.fromBigInt(BigInt.parse(integerPart));
+    }
+
+    var decimalPart = '';
+    if (value.codeUnitAt(index) == dotCode) {
+      index++;
+      nextIndex = nextNonDigit(value, index);
+      decimalPart = value.substring(index, nextIndex);
+      index = nextIndex;
+
+      if (index >= value.length) {
+        return BigDecimal._(
+          intVal: BigInt.parse('$integerPart$decimalPart'),
+          scale: decimalPart.length,
+        );
+      }
+    }
+
+    switch (value.codeUnitAt(index)) {
+      case smallECode:
+      case capitalECode:
+        index++;
+        final exponent = int.parse(value.substring(index));
+        return BigDecimal._(
+          intVal: BigInt.parse('$integerPart$decimalPart'),
+          scale: decimalPart.length - exponent,
+        );
+    }
+
+    throw Exception(
+      'Not a valid BigDecimal string representation: $value.\n'
+      'Unexpected ${value.substring(index)}.',
     );
   }
 
