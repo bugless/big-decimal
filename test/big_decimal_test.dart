@@ -284,4 +284,47 @@ void main() {
       expect(() => '0.331276'.dec.withScale(2).toString(), throwsException);
     });
   });
+
+  group(
+    'toString()',
+    tabular((Object a, String result) {
+      expect(
+        a.dec.toString(),
+        result,
+      );
+    }, [
+      // zeroes
+      tabCase(['0', '0']),
+      tabCase(['+0', '0']),
+      tabCase(['-0', '0']),
+      tabCase(['0.0', '0.0']),
+      tabCase(['+0.0', '0.0']),
+      tabCase(['-0.0', '0.0']),
+      tabCase(['.0', '0.0']),
+      tabCase(['+.0', '0.0']),
+      tabCase(['-.0', '0.0']),
+      // no scale
+      tabCase(['1', '1']),
+      tabCase(['-1', '-1']),
+      // with scale/decimal
+      tabCase(['1.0', '1.0']),
+      tabCase(['-1.0', '-1.0']),
+      tabCase(['.5', '0.5']),
+      tabCase(['-.5', '-0.5']),
+      // with exponent input
+      tabCase(['3e-2', '0.03']),
+      tabCase(['3e-1', '0.3']),
+      tabCase(['-3e-1', '-0.3']),
+      tabCase(['3e0', '3']),
+      tabCase(['3.0e0', '3.0']),
+      tabCase(['3.0e-1', '0.30']),
+      tabCase(['-3.0e-1', '-0.30']),
+      tabCase(['3.0e1', '30']),
+      // with exponent toString()
+      tabCase(['3e2', '3e+2']),
+      tabCase(['123.456e-9', '1.23456e-7']),
+      tabCase(['300e1', '3.00e+3']),
+      tabCase(['123.456e-8', '0.00000123456']),
+    ]),
+  );
 }

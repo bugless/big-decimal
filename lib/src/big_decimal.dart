@@ -348,10 +348,46 @@ class BigDecimal implements Comparable<BigDecimal> {
     return _add(intVal, -other.intVal, scale, other.scale).intVal.sign;
   }
 
-  // TODO: Better impl
   @override
   String toString() {
-    final intStr = intVal.toString();
-    return '${intStr.substring(0, intStr.length - scale)}.${intStr.substring(intStr.length - scale)}';
+    if (scale == 0) {
+      return intVal.toString();
+    }
+
+    final intStr = intVal.abs().toString();
+    final b = StringBuffer(intVal.isNegative ? '-' : '');
+
+    final adjusted = (intStr.length - 1) - scale;
+    // Java's heuristic to avoid too many decimal places
+    if (scale >= 0 && adjusted >= -6) {
+      print(intStr);
+      print(scale);
+      if (intStr.length > scale) {
+        final integerPart = intStr.substring(0, intStr.length - scale);
+        b.write(integerPart);
+
+        final decimalPart = intStr.substring(intStr.length - scale);
+        if (decimalPart.isNotEmpty) {
+          b.write('.$decimalPart');
+        }
+      } else {
+        b..write('0.')..write(intStr.padLeft(scale, '0'));
+      }
+    } else {
+      // Exponential notation
+      b.write(intStr[0]);
+      if (intStr.length > 1) {
+        b..write('.')..write(intStr.substring(1));
+      }
+      if (adjusted != 0) {
+        b.write('e');
+        if (adjusted > 0) {
+          b.write('+');
+        }
+        b.write(adjusted);
+      }
+    }
+
+    return b.toString();
   }
 }
