@@ -1,5 +1,3 @@
-final _pattern = RegExp(r'^([+-]?\d*)(\.\d*)?([eE][+-]?\d+)?$');
-
 enum RoundingMode {
   UP,
   DOWN,
@@ -10,6 +8,14 @@ enum RoundingMode {
   HALF_EVEN,
   UNNECESSARY,
 }
+
+const plusCode = 43;
+const minusCode = 45;
+const dotCode = 46;
+const smallECode = 101;
+const capitalECode = 69;
+const zeroCode = 48;
+const nineCode = 57;
 
 class BigDecimal implements Comparable<BigDecimal> {
   BigDecimal._({
@@ -24,26 +30,79 @@ class BigDecimal implements Comparable<BigDecimal> {
     );
   }
 
+  static int nextNonDigit(String value, [int start = 0]) {
+    var index = start;
+    for (; index < value.length; index++) {
+      final code = value.codeUnitAt(index);
+      if (code < zeroCode || code > nineCode) {
+        break;
+      }
+    }
+    return index;
+  }
+
+  static BigDecimal? tryParse(String value) {
+    try {
+      return BigDecimal.parse(value);
+    } catch (e) {
+      return null;
+    }
+  }
+
   factory BigDecimal.parse(String value) {
-    // TODO: Change this into Java implementation
-    final match = _pattern.firstMatch(value);
-    if (match == null) {
-      throw FormatException('Invalid BigDecimal forma for $value');
-    }
-    final intPart = match.group(1)!;
-    final decimalWithSeparator = match.group(2);
+    var sign = '';
+    var index = 0;
+    var nextIndex = 0;
 
-    if (decimalWithSeparator != null) {
-      final decimalPart = decimalWithSeparator.substring(1);
-      return BigDecimal._(
-        intVal: BigInt.parse(intPart + decimalPart),
-        scale: decimalPart.length,
-      );
+    switch (value.codeUnitAt(index)) {
+      case minusCode:
+        sign = '-';
+        index++;
+        break;
+      case plusCode:
+        index++;
+        break;
+      default:
+        break;
     }
 
-    return BigDecimal._(
-      intVal: BigInt.parse(intPart),
-      scale: 0,
+    nextIndex = nextNonDigit(value, index);
+    final integerPart = '$sign${value.substring(index, nextIndex)}';
+    index = nextIndex;
+
+    if (index >= value.length) {
+      return BigDecimal.fromBigInt(BigInt.parse(integerPart));
+    }
+
+    var decimalPart = '';
+    if (value.codeUnitAt(index) == dotCode) {
+      index++;
+      nextIndex = nextNonDigit(value, index);
+      decimalPart = value.substring(index, nextIndex);
+      index = nextIndex;
+
+      if (index >= value.length) {
+        return BigDecimal._(
+          intVal: BigInt.parse('$integerPart$decimalPart'),
+          scale: decimalPart.length,
+        );
+      }
+    }
+
+    switch (value.codeUnitAt(index)) {
+      case smallECode:
+      case capitalECode:
+        index++;
+        final exponent = int.parse(value.substring(index));
+        return BigDecimal._(
+          intVal: BigInt.parse('$integerPart$decimalPart'),
+          scale: decimalPart.length - exponent,
+        );
+    }
+
+    throw Exception(
+      'Not a valid BigDecimal string representation: $value.\n'
+      'Unexpected ${value.substring(index)}.',
     );
   }
 
@@ -51,19 +110,16 @@ class BigDecimal implements Comparable<BigDecimal> {
   late final int precision = _calculatePrecision();
   final int scale;
 
-  // TODO: Fix
   @override
-  bool operator ==(dynamic other) =>
-      other is BigDecimal && compareTo(other) == 0;
+  bool operator ==(dynamic other) => other is BigDecimal && compareTo(other) == 0;
 
-  BigDecimal operator +(BigDecimal other) =>
-      _add(intVal, other.intVal, scale, other.scale);
+  bool exactlyEquals(dynamic other) => other is BigDecimal && intVal == other.intVal && scale == other.scale;
 
-  BigDecimal operator *(BigDecimal other) =>
-      BigDecimal._(intVal: intVal * other.intVal, scale: scale + other.scale);
+  BigDecimal operator +(BigDecimal other) => _add(intVal, other.intVal, scale, other.scale);
 
-  BigDecimal operator -(BigDecimal other) =>
-      _add(intVal, -other.intVal, scale, other.scale);
+  BigDecimal operator *(BigDecimal other) => BigDecimal._(intVal: intVal * other.intVal, scale: scale + other.scale);
+
+  BigDecimal operator -(BigDecimal other) => _add(intVal, -other.intVal, scale, other.scale);
 
   bool operator <(BigDecimal other) => compareTo(other) < 0;
 
@@ -82,8 +138,7 @@ class BigDecimal implements Comparable<BigDecimal> {
     RoundingMode roundingMode = RoundingMode.UNNECESSARY,
     int? scale,
   }) =>
-      _divide(intVal, this.scale, divisor.intVal, divisor.scale,
-          scale ?? this.scale, roundingMode);
+      _divide(intVal, this.scale, divisor.intVal, divisor.scale, scale ?? this.scale, roundingMode);
 
   BigDecimal pow(int n) {
     if (n >= 0 && n <= 999999999) {
@@ -91,8 +146,7 @@ class BigDecimal implements Comparable<BigDecimal> {
       final newScale = scale * n;
       return BigDecimal._(intVal: intVal.pow(n), scale: newScale);
     }
-    throw Exception(
-        'Invalid operation: Exponent should be between 0 and 999999999');
+    throw Exception('Invalid operation: Exponent should be between 0 and 999999999');
   }
 
   BigDecimal withScale(
@@ -110,8 +164,7 @@ class BigDecimal implements Comparable<BigDecimal> {
         return BigDecimal._(intVal: intResult, scale: newScale);
       } else {
         final drop = sumScale(scale, -newScale);
-        return _divideAndRound(intVal, BigInt.from(10).pow(drop), newScale,
-            roundingMode, newScale);
+        return _divideAndRound(intVal, BigInt.from(10).pow(drop), newScale, roundingMode, newScale);
       }
     }
   }
@@ -124,8 +177,7 @@ class BigDecimal implements Comparable<BigDecimal> {
     return intVal.abs().compareTo(BigInt.from(10).pow(r)) < 0 ? r : r + 1;
   }
 
-  static BigDecimal _add(
-      BigInt intValA, BigInt intValB, int scaleA, int scaleB) {
+  static BigDecimal _add(BigInt intValA, BigInt intValB, int scaleA, int scaleB) {
     final scaleDiff = scaleA - scaleB;
     if (scaleDiff == 0) {
       return BigDecimal._(intVal: intValA + intValB, scale: scaleA);
@@ -153,14 +205,12 @@ class BigDecimal implements Comparable<BigDecimal> {
       final newScale = scale + divisorScale;
       final raise = newScale - dividendScale;
       final scaledDividend = dividend * BigInt.from(10).pow(raise);
-      return _divideAndRound(
-          scaledDividend, divisor, scale, roundingMode, scale);
+      return _divideAndRound(scaledDividend, divisor, scale, roundingMode, scale);
     } else {
       final newScale = sumScale(dividendScale, -scale);
       final raise = newScale - divisorScale;
       final scaledDivisor = divisor * BigInt.from(10).pow(raise);
-      return _divideAndRound(
-          dividend, scaledDivisor, scale, roundingMode, scale);
+      return _divideAndRound(dividend, scaledDivisor, scale, roundingMode, scale);
     }
   }
 
@@ -172,14 +222,11 @@ class BigDecimal implements Comparable<BigDecimal> {
     int preferredScale,
   ) {
     final quotient = dividend ~/ divisor;
-    final remainder = dividend.remainder(divisor);
+    final remainder = dividend.remainder(divisor).abs();
     final quotientPositive = dividend.sign == divisor.sign;
-
     if (remainder != BigInt.zero) {
-      if (_needIncrement(
-          divisor, roundingMode, quotientPositive, quotient, remainder)) {
-        final intResult =
-            quotient + (quotientPositive ? BigInt.one : -BigInt.one);
+      if (_needIncrement(divisor, roundingMode, quotientPositive, quotient, remainder)) {
+        final intResult = quotient + (quotientPositive ? BigInt.one : -BigInt.one);
         return BigDecimal._(intVal: intResult, scale: scale);
       }
       return BigDecimal._(intVal: quotient, scale: scale);
@@ -224,8 +271,7 @@ class BigDecimal implements Comparable<BigDecimal> {
     BigInt quotient,
     BigInt remainder,
   ) {
-    final remainderComparisonToHalfDivisor =
-        (remainder * BigInt.from(2)).compareTo(divisor);
+    final remainderComparisonToHalfDivisor = (remainder * BigInt.from(2)).compareTo(divisor);
     switch (roundingMode) {
       case RoundingMode.UNNECESSARY:
         throw Exception('Rounding necessary');
@@ -285,12 +331,46 @@ class BigDecimal implements Comparable<BigDecimal> {
     return _add(intVal, -other.intVal, scale, other.scale).intVal.sign;
   }
 
-  // TODO: Better impl
   @override
   String toString() {
-    final intStr = intVal.toString();
-    return '${intStr.substring(0, intStr.length - scale)}.${intStr.substring(intStr.length - scale)}';
+    if (scale == 0) {
+      return intVal.toString();
+    }
+
+    final intStr = intVal.abs().toString();
+    final b = StringBuffer(intVal.isNegative ? '-' : '');
+
+    final adjusted = (intStr.length - 1) - scale;
+    // Java's heuristic to avoid too many decimal places
+    if (scale >= 0 && adjusted >= -6) {
+      print(intStr);
+      print(scale);
+      if (intStr.length > scale) {
+        final integerPart = intStr.substring(0, intStr.length - scale);
+        b.write(integerPart);
+
+        final decimalPart = intStr.substring(intStr.length - scale);
+        if (decimalPart.isNotEmpty) {
+          b.write('.$decimalPart');
+        }
+      } else {
+        b..write('0.')..write(intStr.padLeft(scale, '0'));
+      }
+    } else {
+      // Exponential notation
+      b.write(intStr[0]);
+      if (intStr.length > 1) {
+        b..write('.')..write(intStr.substring(1));
+      }
+      if (adjusted != 0) {
+        b.write('e');
+        if (adjusted > 0) {
+          b.write('+');
+        }
+        b.write(adjusted);
+      }
+    }
+
+    return b.toString();
   }
 }
-
-BigDecimal dec(String value) => BigDecimal.parse(value);
