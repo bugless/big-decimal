@@ -321,6 +321,72 @@ void main() {
   });
 
   group(
+    'toDouble',
+    tabular((BigDecimal bd, double d) {
+      expect(bd.toDouble(), d);
+    }, [
+      tabCase(['1.5'.dec, 1.5]),
+      tabCase(['0'.dec, 0.0]),
+      tabCase(['-0'.dec, 0.0]),
+      tabCase([BigInt.from(9223372036854775807).dec, 9223372036854775807.0]),
+      // the above case and the one below are actually the same, because
+      // 9223372036854775807 is not perfectly representable by a double
+      // it gets "rounded" to 9223372036854776000.0
+      tabCase([BigInt.from(9223372036854775807).dec, 9223372036854776000.0]),
+      tabCase([BigInt.from(-9223372036854775808).dec, -9223372036854775808.0]),
+      tabCase([BigInt.from(-9223372036854775808).dec, -9223372036854776000.0]),
+    ]),
+  );
+
+  group(
+    'toBigInt',
+    tabular((BigDecimal bd, BigInt bint, [RoundingMode roundingMode = RoundingMode.UNNECESSARY]) {
+      expect(bd.toBigInt(roundingMode: roundingMode), bint);
+    }, [
+      tabCase(['1.5'.dec, BigInt.from(1), RoundingMode.DOWN]),
+      tabCase(['1.5'.dec, BigInt.from(1), RoundingMode.FLOOR]),
+      tabCase(['1.5'.dec, BigInt.from(2), RoundingMode.UP]),
+      tabCase(['1.5'.dec, BigInt.from(2), RoundingMode.CEILING]),
+      tabCase(['1.5'.dec, BigInt.from(2), RoundingMode.HALF_EVEN]),
+      tabCase(['1.5'.dec, BigInt.from(2), RoundingMode.HALF_UP]),
+      tabCase(['1.5'.dec, BigInt.from(1), RoundingMode.HALF_DOWN]),
+      tabCase(['-1.5'.dec, BigInt.from(-1), RoundingMode.DOWN]),
+      tabCase(['-1.5'.dec, BigInt.from(-2), RoundingMode.FLOOR]),
+      tabCase(['-1.5'.dec, BigInt.from(-2), RoundingMode.UP]),
+      tabCase(['-1.5'.dec, BigInt.from(-1), RoundingMode.CEILING]),
+      tabCase(['-1.5'.dec, BigInt.from(-2), RoundingMode.HALF_EVEN]),
+      tabCase(['-1.5'.dec, BigInt.from(-2), RoundingMode.HALF_UP]),
+      tabCase(['-1.5'.dec, BigInt.from(-1), RoundingMode.HALF_DOWN]),
+      tabCase(['92233720368547758089999'.dec, BigInt.parse('92233720368547758089999')], 'very large integer'),
+      tabCase(['-92233720368547758089999'.dec, BigInt.parse('-92233720368547758089999')], 'very small integer'),
+    ]),
+  );
+
+  group(
+    'toInt',
+    tabular((BigDecimal bd, int i, [RoundingMode roundingMode = RoundingMode.UNNECESSARY]) {
+      expect(bd.toInt(roundingMode: roundingMode), i);
+    }, [
+      tabCase(['1.5'.dec, 1, RoundingMode.DOWN]),
+      tabCase(['1.5'.dec, 1, RoundingMode.FLOOR]),
+      tabCase(['1.5'.dec, 2, RoundingMode.UP]),
+      tabCase(['1.5'.dec, 2, RoundingMode.CEILING]),
+      tabCase(['1.5'.dec, 2, RoundingMode.HALF_EVEN]),
+      tabCase(['1.5'.dec, 2, RoundingMode.HALF_UP]),
+      tabCase(['1.5'.dec, 1, RoundingMode.HALF_DOWN]),
+      tabCase(['-1.5'.dec, -1, RoundingMode.DOWN]),
+      tabCase(['-1.5'.dec, -2, RoundingMode.FLOOR]),
+      tabCase(['-1.5'.dec, -2, RoundingMode.UP]),
+      tabCase(['-1.5'.dec, -1, RoundingMode.CEILING]),
+      tabCase(['-1.5'.dec, -2, RoundingMode.HALF_EVEN]),
+      tabCase(['-1.5'.dec, -2, RoundingMode.HALF_UP]),
+      tabCase(['-1.5'.dec, -1, RoundingMode.HALF_DOWN]),
+      tabCase(['92233720368547758089999'.dec, 9223372036854775807], 'very large integer'),
+      tabCase(['-92233720368547758089999'.dec, -9223372036854775808], 'very small integer'),
+    ]),
+  );
+
+  group(
     'toString()',
     tabular((Object a, String result) {
       expect(

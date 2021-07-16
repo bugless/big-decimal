@@ -149,6 +149,11 @@ class BigDecimal implements Comparable<BigDecimal> {
     throw Exception('Invalid operation: Exponent should be between 0 and 999999999');
   }
 
+  double toDouble() => intVal.toDouble() / BigInt.from(10).pow(scale).toDouble();
+  BigInt toBigInt({RoundingMode roundingMode = RoundingMode.UNNECESSARY}) =>
+      withScale(0, roundingMode: roundingMode).intVal;
+  int toInt({RoundingMode roundingMode = RoundingMode.UNNECESSARY}) => toBigInt(roundingMode: roundingMode).toInt();
+
   BigDecimal withScale(
     int newScale, {
     RoundingMode roundingMode = RoundingMode.UNNECESSARY,
