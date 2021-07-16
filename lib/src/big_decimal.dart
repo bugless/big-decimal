@@ -112,10 +112,12 @@ class BigDecimal implements Comparable<BigDecimal> {
   late final int precision = _calculatePrecision();
   final int scale;
 
-  // TODO: Fix
   @override
   bool operator ==(dynamic other) =>
       other is BigDecimal && compareTo(other) == 0;
+
+  bool exactlyEquals(dynamic other) =>
+      other is BigDecimal && intVal == other.intVal && scale == other.scale;
 
   BigDecimal operator +(BigDecimal other) =>
       _add(intVal, other.intVal, scale, other.scale);

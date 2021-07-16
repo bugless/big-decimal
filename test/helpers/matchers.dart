@@ -11,12 +11,7 @@ class ExactlyBigDecimal extends Matcher {
       description.add('Exactly ').addDescriptionOf(expected);
 
   @override
-  bool matches(dynamic item, Map matchState) {
-    if (item is! BigDecimal) {
-      return false;
-    }
-    return item.intVal == expected.intVal && item.scale == expected.scale;
-  }
+  bool matches(dynamic item, Map matchState) => expected.exactlyEquals(item);
 }
 
 Matcher exactly(BigDecimal expected) => ExactlyBigDecimal(expected);
