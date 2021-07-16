@@ -1,5 +1,3 @@
-final _pattern = RegExp(r'^([+-]?\d*)(\.\d*)?([eE][+-]?\d+)?$');
-
 enum RoundingMode {
   UP,
   DOWN,

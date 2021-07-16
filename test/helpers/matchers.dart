@@ -7,8 +7,7 @@ class ExactlyBigDecimal extends Matcher {
   final BigDecimal expected;
 
   @override
-  Description describe(Description description) =>
-      description.add('Exactly ').addDescriptionOf(expected);
+  Description describe(Description description) => description.add('Exactly ').addDescriptionOf(expected);
 
   @override
   bool matches(dynamic item, Map matchState) => expected.exactlyEquals(item);
