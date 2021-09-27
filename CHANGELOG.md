@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.3.0
+## 0.3.1
 - Add missing hashCode implementation ~aka remove feature where all BigDecimals were different~
 
 ## 0.2.1
