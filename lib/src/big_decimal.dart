@@ -337,6 +337,9 @@ class BigDecimal implements Comparable<BigDecimal> {
   }
 
   @override
+  int get hashCode => 31 * intVal.hashCode + scale;
+
+  @override
   String toString() {
     if (scale == 0) {
       return intVal.toString();

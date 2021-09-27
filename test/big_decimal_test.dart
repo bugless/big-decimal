@@ -428,4 +428,20 @@ void main() {
       tabCase(['123.456e-8', '0.00000123456']),
     ]),
   );
+
+  group('hashcode', () {
+    test('same for equal numbers', () {
+      expect('1.0'.dec.hashCode, '1.0'.dec.hashCode);
+      expect('-1.0'.dec.hashCode, '-1.0'.dec.hashCode);
+      expect('1.0000'.dec.hashCode, '1.0000'.dec.hashCode);
+      expect('0'.dec.hashCode, '0'.dec.hashCode);
+    });
+
+    test('different for different numbers', () {
+      expect(false, '1.0'.dec.hashCode == '1.00'.dec.hashCode);
+      expect(false, '-1.0'.dec.hashCode == '1.0'.dec.hashCode);
+      expect(false, '1.0000'.dec.hashCode == '2'.dec.hashCode);
+      expect(false, '0'.dec.hashCode == '0.00'.dec.hashCode);
+    });
+  });
 }
