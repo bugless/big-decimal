@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.4.0
+- Add `zero`, `one` and `two` static values: e.g. `BigDecimal.zero`
+
 ## 0.3.1
 - Add missing hashCode implementation ~aka remove feature where all BigDecimals were different~
 

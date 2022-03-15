@@ -30,6 +30,10 @@ class BigDecimal implements Comparable<BigDecimal> {
     );
   }
 
+  static BigDecimal zero = BigDecimal.fromBigInt(BigInt.zero);
+  static BigDecimal one = BigDecimal.fromBigInt(BigInt.one);
+  static BigDecimal two = BigDecimal.fromBigInt(BigInt.two);
+
   static int nextNonDigit(String value, [int start = 0]) {
     var index = start;
     for (; index < value.length; index++) {
