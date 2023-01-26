@@ -10,70 +10,81 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1.3
         with:
-          sdk: 2.13.4
+          sdk: stable
       - id: install
         name: Install dependencies
         run: dart pub get
       - name: Check formatting
         if: always() && steps.install.outcome == 'success'
-        run: dart format --line-length 120 --set-exit-if-changed .
+        run: dart format --set-exit-if-changed .
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1.3
         with:
-          sdk: 2.13.4
+          sdk: stable
       - id: install
         name: Install dependencies
         run: dart pub get
       - name: Test
         if: always() && steps.install.outcome == 'success'
-        run: pub run test
+        run: dart test
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1.3
+        with:
+          sdk: stable
+      - id: install
+        name: Install dependencies
+        run: dart pub get
+      - name: Analyze
+        if: always() && steps.install.outcome == 'success'
+        run: dart analyze
   create-tag-and-release:
     needs:
       - lint
       - test
+      - analyze
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
       - id: check_version_and_changelog
         name: Check if version on pubspec.yaml was changed and if there's an entry for this new version on CHANGELOG
         uses: comigor/actions/check-version-and-changelog@master
         with:
-          base_ref: ${{ github.ref }}
-        continue-on-error: true
+          base_ref: "${{ github.ref }}"
       - name: Push tag
         uses: anothrNick/github-tag-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CUSTOM_TAG: v${{ steps.check_version_and_changelog.outputs.package_version }}
+          CUSTOM_TAG: "v${{ steps.check_version_and_changelog.outputs.package_version }}"
       - name: Create release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.check_version_and_changelog.outputs.package_version }}
-          release_name: Release v${{ steps.check_version_and_changelog.outputs.package_version }}
+          tag_name: "v${{ steps.check_version_and_changelog.outputs.package_version }}"
+          release_name: "Release v${{ steps.check_version_and_changelog.outputs.package_version }}"
   deploy:
     needs: create-tag-and-release
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
     steps:
-      - uses: actions/checkout@v2
-      - name: Check PR labels action step
-        id: check_pr_labels
-        uses: shioyang/check-pr-labels-on-push-action@v1.0.3
+      - uses: actions/checkout@master
+      - uses: dart-lang/setup-dart@v1.3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          labels: '["release"]'
+          sdk: stable
+      - id: install
+        name: Install dependencies
+        run: dart pub get
       - name: Publish to pub.dev
-        if: steps.check_pr_labels.outputs.result == 'true'
-        uses: comigor/actions/pub-publish@master
-        env:
-          PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
-        with:
-          pub_credentials: ${{ secrets.PUB_CREDENTIALS }}
+        run: |
+          mkdir -p ~/.pub-cache/credentials.json
+          echo "${{ secrets.PUB_CREDENTIALS }}" > ~/.config/dart/pub-credentials.json
+          echo y | dart pub publish

@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 enum RoundingMode {
   UP,
   DOWN,
@@ -364,13 +366,17 @@ class BigDecimal implements Comparable<BigDecimal> {
           b.write('.$decimalPart');
         }
       } else {
-        b..write('0.')..write(intStr.padLeft(scale, '0'));
+        b
+          ..write('0.')
+          ..write(intStr.padLeft(scale, '0'));
       }
     } else {
       // Exponential notation
       b.write(intStr[0]);
       if (intStr.length > 1) {
-        b..write('.')..write(intStr.substring(1));
+        b
+          ..write('.')
+          ..write(intStr.substring(1));
       }
       if (adjusted != 0) {
         b.write('e');

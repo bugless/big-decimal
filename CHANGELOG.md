@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.4.1
+- Fix CI and update package to use lints
+
 ## 0.4.0
 - Add `zero`, `one` and `two` static values: e.g. `BigDecimal.zero`
 
