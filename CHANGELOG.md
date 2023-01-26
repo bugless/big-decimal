@@ -1,7 +1,7 @@
 # CHANGELOG
 
-## 0.4.2
-- (Really) fix CI (I'm trying not to commit on master, but it's always difficult to test CI)
+## 0.4.3
+- (Really) fix CI
 
 ## 0.4.1
 - Fix CI and update package to use lints
