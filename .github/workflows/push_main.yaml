@@ -51,7 +51,7 @@ jobs:
       - test
       - analyze
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@master
       - id: check_version_and_changelog
@@ -74,7 +74,7 @@ jobs:
   deploy:
     needs: create-tag-and-release
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@master
       - uses: dart-lang/setup-dart@v1.3
