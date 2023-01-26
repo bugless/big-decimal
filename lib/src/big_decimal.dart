@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 enum RoundingMode {
   UP,
   DOWN,
@@ -115,15 +117,20 @@ class BigDecimal implements Comparable<BigDecimal> {
   final int scale;
 
   @override
-  bool operator ==(dynamic other) => other is BigDecimal && compareTo(other) == 0;
+  bool operator ==(dynamic other) =>
+      other is BigDecimal && compareTo(other) == 0;
 
-  bool exactlyEquals(dynamic other) => other is BigDecimal && intVal == other.intVal && scale == other.scale;
+  bool exactlyEquals(dynamic other) =>
+      other is BigDecimal && intVal == other.intVal && scale == other.scale;
 
-  BigDecimal operator +(BigDecimal other) => _add(intVal, other.intVal, scale, other.scale);
+  BigDecimal operator +(BigDecimal other) =>
+      _add(intVal, other.intVal, scale, other.scale);
 
-  BigDecimal operator *(BigDecimal other) => BigDecimal._(intVal: intVal * other.intVal, scale: scale + other.scale);
+  BigDecimal operator *(BigDecimal other) =>
+      BigDecimal._(intVal: intVal * other.intVal, scale: scale + other.scale);
 
-  BigDecimal operator -(BigDecimal other) => _add(intVal, -other.intVal, scale, other.scale);
+  BigDecimal operator -(BigDecimal other) =>
+      _add(intVal, -other.intVal, scale, other.scale);
 
   bool operator <(BigDecimal other) => compareTo(other) < 0;
 
@@ -142,7 +149,8 @@ class BigDecimal implements Comparable<BigDecimal> {
     RoundingMode roundingMode = RoundingMode.UNNECESSARY,
     int? scale,
   }) =>
-      _divide(intVal, this.scale, divisor.intVal, divisor.scale, scale ?? this.scale, roundingMode);
+      _divide(intVal, this.scale, divisor.intVal, divisor.scale,
+          scale ?? this.scale, roundingMode);
 
   BigDecimal pow(int n) {
     if (n >= 0 && n <= 999999999) {
@@ -150,13 +158,16 @@ class BigDecimal implements Comparable<BigDecimal> {
       final newScale = scale * n;
       return BigDecimal._(intVal: intVal.pow(n), scale: newScale);
     }
-    throw Exception('Invalid operation: Exponent should be between 0 and 999999999');
+    throw Exception(
+        'Invalid operation: Exponent should be between 0 and 999999999');
   }
 
-  double toDouble() => intVal.toDouble() / BigInt.from(10).pow(scale).toDouble();
+  double toDouble() =>
+      intVal.toDouble() / BigInt.from(10).pow(scale).toDouble();
   BigInt toBigInt({RoundingMode roundingMode = RoundingMode.UNNECESSARY}) =>
       withScale(0, roundingMode: roundingMode).intVal;
-  int toInt({RoundingMode roundingMode = RoundingMode.UNNECESSARY}) => toBigInt(roundingMode: roundingMode).toInt();
+  int toInt({RoundingMode roundingMode = RoundingMode.UNNECESSARY}) =>
+      toBigInt(roundingMode: roundingMode).toInt();
 
   BigDecimal withScale(
     int newScale, {
@@ -173,7 +184,8 @@ class BigDecimal implements Comparable<BigDecimal> {
         return BigDecimal._(intVal: intResult, scale: newScale);
       } else {
         final drop = sumScale(scale, -newScale);
-        return _divideAndRound(intVal, BigInt.from(10).pow(drop), newScale, roundingMode, newScale);
+        return _divideAndRound(intVal, BigInt.from(10).pow(drop), newScale,
+            roundingMode, newScale);
       }
     }
   }
@@ -186,7 +198,8 @@ class BigDecimal implements Comparable<BigDecimal> {
     return intVal.abs().compareTo(BigInt.from(10).pow(r)) < 0 ? r : r + 1;
   }
 
-  static BigDecimal _add(BigInt intValA, BigInt intValB, int scaleA, int scaleB) {
+  static BigDecimal _add(
+      BigInt intValA, BigInt intValB, int scaleA, int scaleB) {
     final scaleDiff = scaleA - scaleB;
     if (scaleDiff == 0) {
       return BigDecimal._(intVal: intValA + intValB, scale: scaleA);
@@ -214,12 +227,14 @@ class BigDecimal implements Comparable<BigDecimal> {
       final newScale = scale + divisorScale;
       final raise = newScale - dividendScale;
       final scaledDividend = dividend * BigInt.from(10).pow(raise);
-      return _divideAndRound(scaledDividend, divisor, scale, roundingMode, scale);
+      return _divideAndRound(
+          scaledDividend, divisor, scale, roundingMode, scale);
     } else {
       final newScale = sumScale(dividendScale, -scale);
       final raise = newScale - divisorScale;
       final scaledDivisor = divisor * BigInt.from(10).pow(raise);
-      return _divideAndRound(dividend, scaledDivisor, scale, roundingMode, scale);
+      return _divideAndRound(
+          dividend, scaledDivisor, scale, roundingMode, scale);
     }
   }
 
@@ -234,8 +249,10 @@ class BigDecimal implements Comparable<BigDecimal> {
     final remainder = dividend.remainder(divisor).abs();
     final quotientPositive = dividend.sign == divisor.sign;
     if (remainder != BigInt.zero) {
-      if (_needIncrement(divisor, roundingMode, quotientPositive, quotient, remainder)) {
-        final intResult = quotient + (quotientPositive ? BigInt.one : -BigInt.one);
+      if (_needIncrement(
+          divisor, roundingMode, quotientPositive, quotient, remainder)) {
+        final intResult =
+            quotient + (quotientPositive ? BigInt.one : -BigInt.one);
         return BigDecimal._(intVal: intResult, scale: scale);
       }
       return BigDecimal._(intVal: quotient, scale: scale);
@@ -280,7 +297,8 @@ class BigDecimal implements Comparable<BigDecimal> {
     BigInt quotient,
     BigInt remainder,
   ) {
-    final remainderComparisonToHalfDivisor = (remainder * BigInt.from(2)).compareTo(divisor);
+    final remainderComparisonToHalfDivisor =
+        (remainder * BigInt.from(2)).compareTo(divisor);
     switch (roundingMode) {
       case RoundingMode.UNNECESSARY:
         throw Exception('Rounding necessary');
@@ -364,13 +382,17 @@ class BigDecimal implements Comparable<BigDecimal> {
           b.write('.$decimalPart');
         }
       } else {
-        b..write('0.')..write(intStr.padLeft(scale, '0'));
+        b
+          ..write('0.')
+          ..write(intStr.padLeft(scale, '0'));
       }
     } else {
       // Exponential notation
       b.write(intStr[0]);
       if (intStr.length > 1) {
-        b..write('.')..write(intStr.substring(1));
+        b
+          ..write('.')
+          ..write(intStr.substring(1));
       }
       if (adjusted != 0) {
         b.write('e');
