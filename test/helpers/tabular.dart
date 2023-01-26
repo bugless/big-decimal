@@ -6,7 +6,8 @@ class TabularCase {
   final String? description;
 }
 
-TabularCase tabCase(List<Object> args, [String? description]) => TabularCase(args, description);
+TabularCase tabCase(List<Object> args, [String? description]) =>
+    TabularCase(args, description);
 
 void Function() tabular(Function runCase, List<TabularCase> cases) => () {
       for (final c in cases.asMap().entries) {
