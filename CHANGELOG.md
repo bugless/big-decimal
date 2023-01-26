@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.4.3
+## 0.4.4
 - (Really) fix CI
 
 ## 0.4.1
