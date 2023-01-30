@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.5.0
+- Add toPlainString()
+
 ## 0.4.4
 - (Really) fix CI
 

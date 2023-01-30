@@ -368,11 +368,41 @@ class BigDecimal implements Comparable<BigDecimal> {
     }
 
     final intStr = intVal.abs().toString();
-    final b = StringBuffer(intVal.isNegative ? '-' : '');
-
     final adjusted = (intStr.length - 1) - scale;
+
     // Java's heuristic to avoid too many decimal places
     if (scale >= 0 && adjusted >= -6) {
+      return toPlainString();
+    }
+
+    // Exponential notation
+    final b = StringBuffer(intVal.isNegative ? '-' : '');
+    b.write(intStr[0]);
+    if (intStr.length > 1) {
+      b
+        ..write('.')
+        ..write(intStr.substring(1));
+    }
+    if (adjusted != 0) {
+      b.write('e');
+      if (adjusted > 0) {
+        b.write('+');
+      }
+      b.write(adjusted);
+    }
+
+    return b.toString();
+  }
+
+  String toPlainString() {
+    if (scale == 0) {
+      return intVal.toString();
+    }
+
+    final intStr = intVal.abs().toString();
+    final b = StringBuffer(intVal.isNegative ? '-' : '');
+
+    if (scale > 0) {
       if (intStr.length > scale) {
         final integerPart = intStr.substring(0, intStr.length - scale);
         b.write(integerPart);
@@ -387,20 +417,7 @@ class BigDecimal implements Comparable<BigDecimal> {
           ..write(intStr.padLeft(scale, '0'));
       }
     } else {
-      // Exponential notation
-      b.write(intStr[0]);
-      if (intStr.length > 1) {
-        b
-          ..write('.')
-          ..write(intStr.substring(1));
-      }
-      if (adjusted != 0) {
-        b.write('e');
-        if (adjusted > 0) {
-          b.write('+');
-        }
-        b.write(adjusted);
-      }
+      b.write(intStr.padRight(scale.abs() + intStr.length, '0'));
     }
 
     return b.toString();
