@@ -493,6 +493,51 @@ void main() {
     ]),
   );
 
+  group(
+    'toPlainString()',
+    tabular((Object a, String result) {
+      expect(
+        a.dec.toPlainString(),
+        result,
+      );
+    }, [
+      // zeroes
+      tabCase(['0', '0']),
+      tabCase(['+0', '0']),
+      tabCase(['-0', '0']),
+      tabCase(['0.0', '0.0']),
+      tabCase(['+0.0', '0.0']),
+      tabCase(['-0.0', '0.0']),
+      tabCase(['.0', '0.0']),
+      tabCase(['+.0', '0.0']),
+      tabCase(['-.0', '0.0']),
+      // // no scale
+      tabCase(['1', '1']),
+      tabCase(['-1', '-1']),
+      // // with scale/decimal
+      tabCase(['1.0', '1.0']),
+      tabCase(['-1.0', '-1.0']),
+      tabCase(['.5', '0.5']),
+      tabCase(['-.5', '-0.5']),
+      // // with exponent input
+      tabCase(['3e-2', '0.03']),
+      tabCase(['3e-1', '0.3']),
+      tabCase(['-3e-1', '-0.3']),
+      tabCase(['3e0', '3']),
+      tabCase(['3.0e0', '3.0']),
+      tabCase(['3.0e-1', '0.30']),
+      tabCase(['-3.0e-1', '-0.30']),
+      tabCase(['3.0e1', '30']),
+      // without exponent toPlainString()
+      tabCase(['3e2', '300']),
+      tabCase(['123.456e-9', '0.000000123456']),
+      tabCase(['300e1', '3000']),
+      tabCase(['123.456e-8', '0.00000123456']),
+      tabCase(['0.00000001', '0.00000001']),
+      tabCase(['1e-8', '0.00000001']),
+    ]),
+  );
+
   group('hashcode', () {
     test('same for equal numbers', () {
       expect('1.0'.dec.hashCode, '1.0'.dec.hashCode);
