@@ -1,9 +1,17 @@
 import 'big_decimal.dart';
 
+/// A [BigDecimal] representing infinity.
+///
+/// This class handles arithmetic operations involving infinite values.
 class BigDecimalInfinity extends BigDecimal {
+  /// Whether this infinity is negative (-Infinity) or positive (Infinity).
   final bool isNegative;
 
-  BigDecimalInfinity({this.isNegative = false}) : super(intVal: BigInt.from(double.maxFinite), scale: 1);
+  /// Creates a [BigDecimalInfinity].
+  ///
+  /// If [isNegative] is true, represents negative infinity.
+  BigDecimalInfinity({this.isNegative = false})
+      : super(intVal: BigInt.from(double.maxFinite), scale: 1);
 
   @override
   BigDecimal operator +(BigDecimal other) {
@@ -59,7 +67,8 @@ class BigDecimalInfinity extends BigDecimal {
   }
 
   @override
-  BigDecimal operator -() => isNegative ? BigDecimal.infinity : BigDecimal.negativeInifinity;
+  BigDecimal operator -() =>
+      isNegative ? BigDecimal.infinity : BigDecimal.negativeInifinity;
 
   @override
   BigDecimal abs() {
@@ -121,17 +130,21 @@ class BigDecimalInfinity extends BigDecimal {
 
   @override
   BigInt toBigInt({RoundingMode roundingMode = RoundingMode.UNNECESSARY}) {
-    throw UnsupportedError('Value must be finite: ${isNegative ? "-Infinity" : "Infinity"}');
+    throw UnsupportedError(
+        'Value must be finite: ${isNegative ? "-Infinity" : "Infinity"}');
   }
 
   @override
   int toInt({RoundingMode roundingMode = RoundingMode.UNNECESSARY}) {
-    throw UnsupportedError('Value must be finite: ${isNegative ? "-Infinity" : "Infinity"}');
+    throw UnsupportedError(
+        'Value must be finite: ${isNegative ? "-Infinity" : "Infinity"}');
   }
 
   @override
-  BigDecimal withScale(int newScale, {RoundingMode roundingMode = RoundingMode.UNNECESSARY}) {
-    throw UnsupportedError('Value must be finite: ${isNegative ? "-Infinity" : "Infinity"}');
+  BigDecimal withScale(int newScale,
+      {RoundingMode roundingMode = RoundingMode.UNNECESSARY}) {
+    throw UnsupportedError(
+        'Value must be finite: ${isNegative ? "-Infinity" : "Infinity"}');
   }
 
   @override

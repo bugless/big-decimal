@@ -5,8 +5,8 @@ description: >
 
 repository: https://github.com/bugless/big-decimal
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.12.0 <4.0.0"
 
 dev_dependencies:
-  lints: ^2.0.1
+  lints: ^5.1.1
   test: ^1.17.2

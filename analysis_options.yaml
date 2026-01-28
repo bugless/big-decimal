@@ -4,3 +4,7 @@ include: package:lints/recommended.yaml
 analyzer:
   exclude:
     - example/**/*.dart
+
+linter:
+  rules:
+    - public_member_api_docs
