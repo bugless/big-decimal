@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.6.0
+- Add support for handling infinity values
+
 ## 0.5.1
 - Fix `toDouble()` allowing it to take negative exponents
 
