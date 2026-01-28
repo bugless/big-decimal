@@ -1,10 +1,12 @@
 # CHANGELOG
 
-## 0.6.0
-- Add support for handling infinity values
+## 0.7.0
 - Fix static analysis issues
 - Add support for Dart 3
 - Remove internal members that were exposed to the API
+
+## 0.6.0
+- Add support for handling infinity values
 
 ## 0.5.1
 - Fix `toDouble()` allowing it to take negative exponents
